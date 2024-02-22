@@ -107,12 +107,14 @@ The following package managers are community maintained and have the most up-to-
     ```sh
     $ brew update
     ```
+
 - Procedure
   - Install using `brew`:
 
     ```sh
     $ brew install etcd
     ```
+
 - Result
   - Verify installation by getting the version:
 
@@ -134,6 +136,7 @@ Alpine Linux provides two separate packages: `etcd` and `etcd-ctl`. They are in 
     # or if you're running as root:
     $ echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing/' >> /etc/apk/repositories
     ```
+
 - Procedure
   - Install using apk:
 
@@ -142,6 +145,7 @@ Alpine Linux provides two separate packages: `etcd` and `etcd-ctl`. They are in 
     # or if you're running as root:
     $ apk add etcd etcd-ctl
     ```
+
 - Result
   - Verify installation by getting the version:
 
@@ -174,6 +178,7 @@ The [Arch User Repository (AUR)] keeps an up-to-date version.
     ```sh
     $ cd etcd
     ```
+
 - Procedure
   - Run `makepkg`:
 
@@ -186,6 +191,7 @@ The [Arch User Repository (AUR)] keeps an up-to-date version.
     ```sh
     $ sudo pacman -U etcd-*.pkg.tar.zst
     ```
+
 - Result
   - Verify installation by getting the version:
 
@@ -205,12 +211,14 @@ ALT Linux Sisyphus maintains an up-to-date version.
     ```sh
     $ sudo apt-get update
     ```
+
 - Procedure
   - Install using `apt-get`:
 
     ```sh
     $ sudo apt-get install etcd
     ```
+
 - Result
   - Verify installation by getting the vesion:
 
@@ -241,5 +249,5 @@ For a slightly more involved sanity check of your installation, see
 [tagged-release]: https://github.com/etcd-io/etcd/releases/tag/{{< param git_version_tag >}}
 [Supported platforms]: {{< relref "op-guide/supported-platform" >}}
 [Bitnami's etcd Helm chart]: https://bitnami.com/stack/etcd/helm
-[Arch User Repository (AUR)]: https://wiki.archlinux.org/title/Arch_User_Repository
-[Homebrew can run on Linux]: https://docs.brew.sh/Homebrew-on-Linux
+[Arch User Repository (AUR)]: <https://wiki.archlinux.org/title/Arch_User_Repository>
+[Homebrew can run on Linux]: <https://docs.brew.sh/Homebrew-on-Linux>
