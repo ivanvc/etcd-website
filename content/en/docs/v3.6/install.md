@@ -93,7 +93,7 @@ $ etcd --version
 
 ## Linux
 
-Although it is possible to install etcd through major distribution's official repositories and package managers, the versions published are significantly outdated. So, installing this way is strongly discouraged.
+Although it is possible to install etcd through many major Linux distribution's official repositories and package managers, the versions published are significantly outdated. So, installing this way is strongly discouraged.
 
 The following package managers are community maintained and have the most up-to-date version:
 
@@ -101,18 +101,21 @@ The following package managers are community maintained and have the most up-to-
 
 [Homebrew can run on Linux], and can provide recent software versions.
 
-* Prerequisites
-  * Update Homebrew:
+- Prerequisites
+  - Update Homebrew:
+
     ```sh
     $ brew update
     ```
-* Procedure
-  * Install using `brew`:
+- Procedure
+  - Install using `brew`:
+
     ```sh
     $ brew install etcd
     ```
-* Result
-  * Verify installation by getting the version:
+- Result
+  - Verify installation by getting the version:
+
     ```sh
     $ etcd --version
     etcd Version: {{< psubstr git_version_tag 1 >}}
@@ -123,22 +126,25 @@ The following package managers are community maintained and have the most up-to-
 
 Alpine Linux provides two separate packages: `etcd` and `etcd-ctl`. They are in the testing repository, so you must enable it before installing.
 
-* Prerequisites
-  * Enable testing repository:
+- Prerequisites
+  - Enable testing repository:
+
     ```sh
     $ echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing/' | sudo tee -a /etc/apk/repositories
     # or if you're running as root:
     $ echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing/' >> /etc/apk/repositories
     ```
-* Procedure
-  * Install using apk:
+- Procedure
+  - Install using apk:
+
     ```sh
     $ sudo apk add etcd etcd-ctl
     # or if you're running as root:
     $ apk add etcd etcd-ctl
     ```
-* Result
-  * Verify installation by getting the version:
+- Result
+  - Verify installation by getting the version:
+
     ```sh
     $ etcd --version
     etcd Version: {{< psubstr git_version_tag 1 >}}
@@ -149,31 +155,40 @@ Alpine Linux provides two separate packages: `etcd` and `etcd-ctl`. They are in 
 
 The [Arch User Repository (AUR)] keeps an up-to-date version.
 
-* Prerequisites
-  * Ensure you have installed the `base-devel` package:
+- Prerequisites
+  - Ensure you have installed the `base-devel` package:
+
     ```sh
     $ sudo pacman -S base-devel
     ```
-  * Fetch the most recent snapshot by going to https://aur.archlinux.org/packages/etcd
-  * Extract the downloaded tar.gz file:
+
+  - Fetch the most recent snapshot by going to <https://aur.archlinux.org/packages/etcd>
+  - Extract the downloaded tar.gz file:
+
     ```sh
     $ tar -zxf etcd.tar.gz
     ```
-  * Change the working directory:
+
+  - Change the working directory:
+
     ```sh
     $ cd etcd
     ```
-* Procedure
-  * Run `makepkg`:
+- Procedure
+  - Run `makepkg`:
+
     ```sh
     $ makepkg -s
     ```
-  * Install the generated pkg file:
+
+  - Install the generated pkg file:
+
     ```sh
     $ sudo pacman -U etcd-*.pkg.tar.zst
     ```
-* Result
-  * Verify installation by getting the version:
+- Result
+  - Verify installation by getting the version:
+
     ```sh
     $ etcd --version
     etcd Version: {{< psubstr git_version_tag 1 >}}
@@ -184,18 +199,21 @@ The [Arch User Repository (AUR)] keeps an up-to-date version.
 
 ALT Linux Sisyphus maintains an up-to-date version.
 
-* Prerequisites
-  * Update apt repository
+- Prerequisites
+  - Update apt repository
+
     ```sh
     $ sudo apt-get update
     ```
-* Procedure
-  * Install using `apt-get`:
+- Procedure
+  - Install using `apt-get`:
+
     ```sh
     $ sudo apt-get install etcd
     ```
-* Result
-  * Verify installation by getting the vesion:
+- Result
+  - Verify installation by getting the vesion:
+
     ```sh
     $ etcd --version
     etcd Version: {{< psubstr git_version_tag 1 >}}
