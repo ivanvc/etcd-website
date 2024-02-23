@@ -18,23 +18,38 @@ jobs:
     - env:
         CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
       run: |
-        git remote add etcd ${{ github.event.pull_request.base.repo.clone_url }}
-        git fetch etcd
-        npm install -g markdownlint-cli
-        has_failures=false
-        for file in ${CHANGED_FILES}; do
-          diff=$(git diff origin/${{ github.event.pull_request.base.ref }} --color=always -- "$file")
-          disabled_rules=""
-          if ! grep "@@ -1," <(echo "$diff") &>/dev/null; then
-            disabled_rules="MD041"
-          fi
-          echo "::group::$file linter results"
-          if ! echo "$diff" | awk '{ if (match($0, /^(\033\[32m\+\033\[m\033\[32m|[^\033])(.*)\033\[m$/, m)) { print m[2] } if (match($0, /^\033\[32m\+\033\[m$/)) { print "" } }' | markdownlint -s --disable "$disabled_rules"; then
-            has_failures=true
-            echo "::error::$file has linter issues"
-          fi
-          echo "::endgroup::"
-        done
-        if [ "$has_failures" ]; then
-          exit 1
+        npm install -g markdownlint-cli2
+
+        remote=origin
+        if [ "${{ github.event.pull_request.base.repo.owner.login }}" == "etcd-io" ]; then
+          remote=etcd
+          git remote add etcd ${{ github.event.pull_request.base.repo.clone_url }}
+          git fetch etcd
         fi
+
+        declare -A files_with_failures
+        for file in ${CHANGED_FILES}; do
+          ranges=$(git diff "$remote"/${{ github.event.pull_request.base.ref }} --diff-algorithm=histogram --diff-filter=ACM --find-renames=100% --no-ext-diff --relative --unified=0 -- "$file" | awk 'match($0, /^@@\s-[0-9,]+\s\+([0-9]+)(,([0-9]+))?/, m) { print m[1] ":" m[1] + ((m[3] == "") ? "0" : m[3]) }')
+          markdownlint-cli2 "$file" 2>/dev/null || true
+          echo "::add-matcher::.github/workflows/markdownlint-problem-matcher.json"
+          lint_result=$(markdownlint-cli2 "$file" 2>&1 >/dev/null || true)
+          for range in $ranges; do
+            start=$(echo "$range" | cut -d: -f1)
+            end=$(echo "$range" | cut -d: -f2)
+            while IFS= read -r line; do
+              line_number=$(echo "$line" | awk -F: '{print $2}' | awk '{print $1}')
+              if [ "$line_number" -ge "$start" ] && [ "$line_number" -le "$end" ]; then
+                files_with_failures["$file"]=1
+                echo "$line"
+              fi
+            done < <(echo "$lint_result")
+          done
+          echo "::remove-matcher owner=markdownlint::"
+        done
+
+        for file in "${!files_with_failures[@]}"; do
+          echo "::error::$file has linting issues"
+        done
+        if [ "${#files_with_failures[@]}" -gt "0" ];
+          exit 1
+        done
