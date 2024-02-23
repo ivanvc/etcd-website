@@ -18,29 +18,39 @@ jobs:
     - env:
         CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
       run: |
+        url_prefix="https://github.com/DavidAnson/markdownlint/blob/main/doc/"
         npm install -g markdownlint-cli2
 
         remote=origin
-        if [ "${{ github.event.pull_request.base.repo.owner.login }}" == "etcd-io" ]; then
-          remote=etcd
-          git remote add etcd ${{ github.event.pull_request.base.repo.clone_url }}
-          git fetch etcd
+        if [ "${{ github.event.pull_request.base.repo.owner.login }}" != "${{ github.event.pull_request.head.repo.owner.login }}" ]; then
+          remote=base
+          git remote add base ${{ github.event.pull_request.base.repo.clone_url }}
+          git fetch base
         fi
 
         declare -A files_with_failures
         for file in ${CHANGED_FILES}; do
-          ranges=$(git diff "$remote"/${{ github.event.pull_request.base.ref }} --diff-algorithm=histogram --diff-filter=ACM --find-renames=100% --no-ext-diff --relative --unified=0 -- "$file" | awk 'match($0, /^@@\s-[0-9,]+\s\+([0-9]+)(,([0-9]+))?/, m) { print m[1] ":" m[1] + ((m[3] == "") ? "0" : m[3]) }')
+          ranges=$(git diff "$remote"/${{ github.event.pull_request.base.ref }} \
+                   --diff-algorithm=histogram \
+                   --diff-filter=ACM \
+                   --find-renames=100% \
+                   --no-ext-diff \
+                   --relative \
+                   --unified=0 -- "$file" | \
+            awk 'match($0, /^@@\s-[0-9,]+\s\+([0-9]+)(,([0-9]+))?/, m) { \
+                       print m[1] ":" m[1] + ((m[3] == "") ? "0" : m[3]) }')
           markdownlint-cli2 "$file" 2>/dev/null || true
           echo "::add-matcher::.github/workflows/markdownlint-problem-matcher.json"
           lint_result=$(markdownlint-cli2 "$file" 2>&1 >/dev/null || true)
           for range in $ranges; do
-            start=$(echo "$range" | cut -d: -f1)
-            end=$(echo "$range" | cut -d: -f2)
+            start=$(echo "$range" | awk -F: '{print $1}')
+            end=$(echo "$range" | awk -F: '{print $2}')
             while IFS= read -r line; do
               line_number=$(echo "$line" | awk -F: '{print $2}' | awk '{print $1}')
               if [ "$line_number" -ge "$start" ] && [ "$line_number" -le "$end" ]; then
+                rule=$(echo "$line" | awk 'match($2, /([^\/]+)/, m) {print tolower(m[1])}')
                 files_with_failures["$file"]=1
-                echo "$line"
+                echo "$line ($url_prefix$rule.md)"
               fi
             done < <(echo "$lint_result")
           done
@@ -50,6 +60,6 @@ jobs:
         for file in "${!files_with_failures[@]}"; do
           echo "::error::$file has linting issues"
         done
-        if [ "${#files_with_failures[@]}" -gt "0" ];
+        if [ "${#files_with_failures[@]}" -gt "0" ]; then
           exit 1
-        done
+        fi
