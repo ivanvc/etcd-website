@@ -1,0 +1,38 @@
+---
+name: Reusable Template to Update Release
+
+on:
+  workflow_call:
+    inputs:
+      release:
+        type: string
+        required: true
+
+jobs:
+  update-release:
+    name: Update Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+      - id: latest-release
+        run: |
+          echo version="$(gh release list -R ivanvc/etcd --json 'tagName' -q 'map(select(.tagName | test("^'"$(echo ${{ inputs.release }}. | sed s/\\./\\\./g)"'"))) | .[0].tagName')" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          minor=${{ inputs.release }}
+          index_file="content/en/docs/$minor/_index.md"
+          latest_version="${{ steps.latest-release.outputs.version }}"
+          branch="release-$minor-update-latest-release-to-$latest_version"
+          if ! grep git_version_tag "$index_file" | grep -v -e "$latest_version"'$' ; then exit 0; fi
+          git checkout -b "$branch"
+          sed -i 's/git_version_tag:\sv\([0-9]\+\.\)\{2\}[0-9]\+/git_version_tag: '$latest_version'/' "$index_file"
+          git add "$index_file"
+          git -c user.name="$GITHUB_ACTOR" -c user.email="$GITHUB_ACTOR@users.noreply.github.com" commit -m "[$minor] Update installation version to latest tag ($latest_version)"
+          git push origin "$branch"
+          gh pr create -f -b "Automated update for $minor: $latest_version"
