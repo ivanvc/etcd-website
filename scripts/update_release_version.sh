@@ -51,6 +51,10 @@ sed -i 's/git_version_tag:\sv\([0-9]\+\.\)\{2\}[0-9]\+/git_version_tag: '"$new_v
 
 # Commit the changes, push and create a PR.
 git add "$index_file"
-git -c user.name="$git_author" -c user.email="$git_email" commit --message "[${release_minor}] Update installation version to latest tag (${new_version})\n\nSigned-off-by: ${git_author} <${git_email}>"
+git -c user.name="$git_author" -c user.email="$git_email" commit --file=- <<EOL
+[${release_minor}] Update installation version to latest tag (${new_version})
+
+Signed-off-by: ${git_author} <${git_email}>
+EOL
 git push "$git_remote" "$branch"
 gh pr create --fill --body "Automated update for ${release_minor}: ${new_version}"
