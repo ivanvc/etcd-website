@@ -54,7 +54,7 @@ for file in "${changed_files[@]}"; do
            --no-ext-diff \
            --relative \
            --unified=0 -- "${file}" | \
-    awk 'match($0, /^@@\s-[0-9,]+\s\+([0-9]+)(,([0-9]+))?/, m) { \
+    gawk 'match($0, /^@@\s-[0-9,]+\s\+([0-9]+)(,([0-9]+))?/, m) { \
                print m[1] ":" m[1] + ((m[3] == "") ? "0" : m[3]) }')
   i=0
   for range in ${ranges}; do
