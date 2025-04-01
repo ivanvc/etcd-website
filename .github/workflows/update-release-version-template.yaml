@@ -23,6 +23,11 @@ jobs:
         run: |
           echo version="$(gh release list --repo etcd-io/etcd --json 'tagName' -q 'map(select(.tagName | test("^'"$(echo "${{ inputs.release }}." | sed s/\\./\\\./g)"'"))) | .[0].tagName')" >> "$GITHUB_OUTPUT"
       - env:
+          DEPLOY_SSH_KEY: ${{ secrets.deploy_ssh_key }}
+        run: |
+          mkdir -p "$HOME"/.ssh
+          echo "$DEPLOY_SSH_KEY" > "$HOME"/.ssh/id_ed25519
+      - env:
           GH_TOKEN: ${{ github.token }}
         run: |
           make update-release-version LATEST_VERSION="${{ steps.latest-release.outputs.version }}"
