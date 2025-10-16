@@ -27,10 +27,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY_OVERRIDE: ${{ inputs.repository_override }}
         run: |
-          echo gh release list \
-                  --repo "${REPOSITORY_OVERRIDE:-"etcd-io/etcd"}" \
-                  --json 'tagName,publishedAt' \
-                  --jq '[map(select(.publishedAt > "'${{ steps.date.outputs.two_days_ago }}'")) | .[] | .tagName] | reverse'
           echo "list=$(\
                 gh release list \
                   --repo "${REPOSITORY_OVERRIDE:-"etcd-io/etcd"}" \
