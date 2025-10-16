@@ -35,6 +35,7 @@ jobs:
                   )" >> "$GITHUB_OUTPUT"
 
   update-release:
+    if: ${{ needs.fetch-latest-releases.outputs.releases != '[]' }}
     name: Update Release
     runs-on: ubuntu-latest
     needs: fetch-latest-releases
