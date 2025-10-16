@@ -16,6 +16,8 @@ jobs:
   fetch-latest-releases:
     name: Fetch Latest Releases
     runs-on: ubuntu-latest
+    outputs:
+      releases: ${{ steps.releases.outputs.list }}
     steps:
       - id: date
         run: |
@@ -28,12 +30,12 @@ jobs:
           echo gh release list \
                   --repo "${REPOSITORY_OVERRIDE:-"etcd-io/etcd"}" \
                   --json 'tagName,publishedAt' \
-                  --jq '[map(select(.publishedAt > "'${{ steps.date.output.two_days_ago }}'")) | .[] | .tagName] | reverse'
-          echo "releases=$(\
+                  --jq '[map(select(.publishedAt > "'${{ steps.date.outputs.two_days_ago }}'")) | .[] | .tagName] | reverse'
+          echo "list=$(\
                 gh release list \
                   --repo "${REPOSITORY_OVERRIDE:-"etcd-io/etcd"}" \
                   --json 'tagName,publishedAt' \
-                  --jq '[map(select(.publishedAt > "'${{ steps.date.output.two_days_ago }}'")) | .[] | .tagName] | reverse' \
+                  --jq '[map(select(.publishedAt > "'${{ steps.date.outputs.two_days_ago }}'")) | .[] | .tagName] | reverse' \
                   )" >> "$GITHUB_OUTPUT"
 
   update-release:
