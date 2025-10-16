@@ -28,12 +28,12 @@ jobs:
           echo gh release list \
                   --repo "${REPOSITORY_OVERRIDE:-"etcd-io/etcd"}" \
                   --json 'tagName,publishedAt' \
-                  --jq '[map(select(.publishedAt > "'${{ steps.data.output.two_days_ago }}'")) | .[] | .tagName] | reverse'
+                  --jq '[map(select(.publishedAt > "'${{ steps.date.output.two_days_ago }}'")) | .[] | .tagName] | reverse'
           echo "releases=$(\
                 gh release list \
                   --repo "${REPOSITORY_OVERRIDE:-"etcd-io/etcd"}" \
                   --json 'tagName,publishedAt' \
-                  --jq '[map(select(.publishedAt > "'${{ steps.data.output.two_days_ago }}'")) | .[] | .tagName] | reverse' \
+                  --jq '[map(select(.publishedAt > "'${{ steps.date.output.two_days_ago }}'")) | .[] | .tagName] | reverse' \
                   )" >> "$GITHUB_OUTPUT"
 
   update-release:
